@@ -271,6 +271,7 @@
 #define AccelStepper_h
 
 #include <stdlib.h>
+#include "ShiftRegister74HC595.h"
 #if ARDUINO >= 100
 #include <Arduino.h>
 #else
@@ -533,8 +534,14 @@ public:
     /// enableOutputs() is called and switched off when disableOutputs() 
     /// is called.
     /// \param[in] enablePin Arduino digital pin number for motor enable
+    /// \param[in] useShiftRegister Whether to use the shift register pin
     /// \sa setPinsInverted
-    void    setEnablePin(uint8_t enablePin = 0xff);
+    void    setEnablePin(uint8_t enablePin = 0xff, bool useShiftRegister = false);
+
+    /// Sets the AccelStepper object to use a shift register for enabling the
+    /// pins.
+    /// \param[in] sr Shift register reference
+    void    setShiftRegister(ShiftRegister74HC595<1>* sr);
 
     /// Sets the inversion for stepper driver pins
     /// \param[in] directionInvert True for inverted direction pin, false for non-inverted
@@ -723,6 +730,12 @@ private:
 
     /// Min step size in microseconds based on maxSpeed
     float _cmin; // at max speed
+
+    /// Shift register reference
+    ShiftRegister74HC595<1>* _sr;
+
+    /// Whether enable uses shift register
+    bool _enable_use_sr;
 
 };
 

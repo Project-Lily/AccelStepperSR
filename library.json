@@ -1,0 +1,32 @@
+{
+  "name": "AccelStepperSR",
+  "version": "1.0.0",
+  "description": "AccelStepper but with shift registers",
+  "keywords": "stepper, accelstepper, stepper motor, shift register, register",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/Project-Lily/AccelStepperSR.git"
+  },
+  "authors":
+  [
+    {
+      "name": "Mike McCauley",
+      "email": "mikem@airspayce.com"
+    },
+    {
+      "name": "Patrick Wasp",
+      "email": "patrickwasp@gmail.com"
+    },
+    {
+      "name": "Jason Hailianto",
+      "url": "jasoncoding.com"
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "simsso/ShiftRegister74HC595": "^1.3.1"
+  },
+  "frameworks": "arduino",
+  "platforms": "*"
+}

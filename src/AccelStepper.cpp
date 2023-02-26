@@ -4,6 +4,7 @@
 // $Id: AccelStepper.cpp,v 1.24 2020/04/20 00:15:03 mikem Exp mikem $
 
 #include "AccelStepper.h"
+#include "ShiftRegister74HC595.h"
 
 #if 0
 // Some debugging assistance
@@ -389,8 +390,13 @@ void AccelStepper::setOutputPins(uint8_t mask)
     else if (_interface == FULL3WIRE || _interface == HALF3WIRE)
 	numpins = 3;
     uint8_t i;
-    for (i = 0; i < numpins; i++)
-	digitalWrite(_pin[i], (mask & (1 << i)) ? (HIGH ^ _pinInverted[i]) : (LOW ^ _pinInverted[i]));
+    for (i = 0; i < numpins; i++) {
+        if (_sr != nullptr) {
+            _sr->set(_pin[i], (mask & (1 << i)) ? (HIGH ^ _pinInverted[i]) : (LOW ^ _pinInverted[i]));
+        } else {
+            digitalWrite(_pin[i], (mask & (1 << i)) ? (HIGH ^ _pinInverted[i]) : (LOW ^ _pinInverted[i]));
+        }
+    }
 }
 
 // 0 pin step function (ie for functional usage)
@@ -574,8 +580,12 @@ void    AccelStepper::disableOutputs()
     setOutputPins(0); // Handles inversion automatically
     if (_enablePin != 0xff)
     {
-        pinMode(_enablePin, OUTPUT);
-        digitalWrite(_enablePin, LOW ^ _enableInverted);
+        if (_enable_use_sr && _sr != nullptr) {
+            _sr->set(_enablePin, LOW ^ _enableInverted);
+        } else {
+            pinMode(_enablePin, OUTPUT);
+            digitalWrite(_enablePin, LOW ^ _enableInverted);
+        }
     }
 }
 
@@ -598,8 +608,12 @@ void    AccelStepper::enableOutputs()
 
     if (_enablePin != 0xff)
     {
-        pinMode(_enablePin, OUTPUT);
-        digitalWrite(_enablePin, HIGH ^ _enableInverted);
+        if (_enable_use_sr && _sr != nullptr) {
+            _sr->set(_enablePin, HIGH ^ _enableInverted);
+        } else {
+            pinMode(_enablePin, OUTPUT);
+            digitalWrite(_enablePin, HIGH ^ _enableInverted);
+        }
     }
 }
 
@@ -608,17 +622,25 @@ void AccelStepper::setMinPulseWidth(unsigned int minWidth)
     _minPulseWidth = minWidth;
 }
 
-void AccelStepper::setEnablePin(uint8_t enablePin)
+void AccelStepper::setEnablePin(uint8_t enablePin, bool useShiftRegister)
 {
     _enablePin = enablePin;
+    _enable_use_sr = useShiftRegister;
 
     // This happens after construction, so init pin now.
-    if (_enablePin != 0xff)
-    {
-        pinMode(_enablePin, OUTPUT);
-        digitalWrite(_enablePin, HIGH ^ _enableInverted);
+    if (_enablePin != 0xff) {
+        if (useShiftRegister && _sr != nullptr) {
+            _sr->set(_enablePin, HIGH ^ _enableInverted);
+        } else {
+            pinMode(_enablePin, OUTPUT);
+            digitalWrite(_enablePin, HIGH ^ _enableInverted);
+        }
     }
 }
+
+void AccelStepper::setShiftRegister(ShiftRegister74HC595<1>* sr) {
+    _sr = sr;
+};
 
 void AccelStepper::setPinsInverted(bool directionInvert, bool stepInvert, bool enableInvert)
 {
