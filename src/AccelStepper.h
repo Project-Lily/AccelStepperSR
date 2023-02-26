@@ -386,6 +386,22 @@ public:
     /// the output pins at construction time.
     AccelStepper(uint8_t interface = AccelStepper::FULL4WIRE, uint8_t pin1 = 2, uint8_t pin2 = 3, uint8_t pin3 = 4, uint8_t pin4 = 5, bool enable = true);
 
+    /// Constructor for shift registers
+    /// \param[in] sr Shift register object reference
+    /// \param[in] pin1 Arduino digital pin number for motor pin 1. Defaults
+    /// to pin 2. For a AccelStepper::DRIVER (interface==1), 
+    /// this is the Step input to the driver. Low to high transition means to step)
+    /// \param[in] pin2 Arduino digital pin number for motor pin 2. Defaults
+    /// to pin 3. For a AccelStepper::DRIVER (interface==1), 
+    /// this is the Direction input the driver. High means forward.
+    /// \param[in] pin3 Arduino digital pin number for motor pin 3. Defaults
+    /// to pin 4.
+    /// \param[in] pin4 Arduino digital pin number for motor pin 4. Defaults
+    /// to pin 5.
+    /// \param[in] enable If this is true (the default), enableOutputs() will be called to enable
+    /// the output pins at construction time.
+    AccelStepper(ShiftRegister74HC595<1>* sr, uint8_t interface = AccelStepper::FULL4WIRE, uint8_t pin1 = 2, uint8_t pin2 = 3, uint8_t pin3 = 4, uint8_t pin4 = 5, bool enable = true);
+
     /// Alternate Constructor which will call your own functions for forward and backward steps. 
     /// You can have multiple simultaneous steppers, all moving
     /// at different speeds and accelerations, provided you call their run()
@@ -538,11 +554,6 @@ public:
     /// \sa setPinsInverted
     void    setEnablePin(uint8_t enablePin = 0xff, bool useShiftRegister = false);
 
-    /// Sets the AccelStepper object to use a shift register for enabling the
-    /// pins.
-    /// \param[in] sr Shift register reference
-    void    setShiftRegister(ShiftRegister74HC595<1>* sr);
-
     /// Sets the inversion for stepper driver pins
     /// \param[in] directionInvert True for inverted direction pin, false for non-inverted
     /// \param[in] stepInvert      True for inverted step pin, false for non-inverted
@@ -664,6 +675,7 @@ protected:
     unsigned long  _stepInterval;
 
 private:
+    void _init(uint8_t interface, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4);
     /// Number of pins on the stepper motor. Permits 2 or 4. 2 pins is a
     /// bipolar, and 4 pins is a unipolar.
     uint8_t        _interface;          // 0, 1, 2, 4, 8, See MotorInterfaceType

@@ -192,6 +192,26 @@ boolean AccelStepper::run()
 
 AccelStepper::AccelStepper(uint8_t interface, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4, bool enable)
 {
+    _init(interface, pin1, pin2, pin3, pin4);
+    if (enable)
+	    enableOutputs();
+}
+
+AccelStepper::AccelStepper(ShiftRegister74HC595<1>* sr, uint8_t interface, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4, bool enable) {
+    _sr = sr;
+    _init(interface, pin1, pin2, pin3, pin4);
+    if (enable)
+	    enableOutputs();
+}
+
+AccelStepper::AccelStepper(void (*forward)(), void (*backward)())
+{
+    _forward = forward;
+    _backward = backward;
+    _init(0, 0, 0, 0, 0);
+}
+
+void AccelStepper::_init(uint8_t interface, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4) {
     _interface = interface;
     _currentPos = 0;
     _targetPos = 0;
@@ -209,43 +229,6 @@ AccelStepper::AccelStepper(uint8_t interface, uint8_t pin1, uint8_t pin2, uint8_
     _pin[3] = pin4;
     _enableInverted = false;
     
-    // NEW
-    _n = 0;
-    _c0 = 0.0;
-    _cn = 0.0;
-    _cmin = 1.0;
-    _direction = DIRECTION_CCW;
-
-    int i;
-    for (i = 0; i < 4; i++)
-	_pinInverted[i] = 0;
-    if (enable)
-	enableOutputs();
-    // Some reasonable default
-    setAcceleration(1);
-    setMaxSpeed(1);
-}
-
-AccelStepper::AccelStepper(void (*forward)(), void (*backward)())
-{
-    _interface = 0;
-    _currentPos = 0;
-    _targetPos = 0;
-    _speed = 0.0;
-    _maxSpeed = 0.0;
-    _acceleration = 0.0;
-    _sqrt_twoa = 1.0;
-    _stepInterval = 0;
-    _minPulseWidth = 1;
-    _enablePin = 0xff;
-    _lastStepTime = 0;
-    _pin[0] = 0;
-    _pin[1] = 0;
-    _pin[2] = 0;
-    _pin[3] = 0;
-    _forward = forward;
-    _backward = backward;
-
     // NEW
     _n = 0;
     _c0 = 0.0;
@@ -594,16 +577,18 @@ void    AccelStepper::enableOutputs()
     if (! _interface) 
 	return;
 
-    pinMode(_pin[0], OUTPUT);
-    pinMode(_pin[1], OUTPUT);
-    if (_interface == FULL4WIRE || _interface == HALF4WIRE)
-    {
-        pinMode(_pin[2], OUTPUT);
-        pinMode(_pin[3], OUTPUT);
-    }
-    else if (_interface == FULL3WIRE || _interface == HALF3WIRE)
-    {
-        pinMode(_pin[2], OUTPUT);
+    if (_sr == nullptr) {
+        pinMode(_pin[0], OUTPUT);
+        pinMode(_pin[1], OUTPUT);
+        if (_interface == FULL4WIRE || _interface == HALF4WIRE)
+        {
+            pinMode(_pin[2], OUTPUT);
+            pinMode(_pin[3], OUTPUT);
+        }
+        else if (_interface == FULL3WIRE || _interface == HALF3WIRE)
+        {
+            pinMode(_pin[2], OUTPUT);
+        }
     }
 
     if (_enablePin != 0xff)
@@ -637,10 +622,6 @@ void AccelStepper::setEnablePin(uint8_t enablePin, bool useShiftRegister)
         }
     }
 }
-
-void AccelStepper::setShiftRegister(ShiftRegister74HC595<1>* sr) {
-    _sr = sr;
-};
 
 void AccelStepper::setPinsInverted(bool directionInvert, bool stepInvert, bool enableInvert)
 {
