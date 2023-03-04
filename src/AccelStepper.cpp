@@ -477,6 +477,21 @@ void AccelStepper::step4(long step)
 	case 3:    //1001
 	    setOutputPins(0b1001);
 	    break;
+    // case 0:    // 1010
+	//     setOutputPins(0b1000);
+	//     break;
+
+	// case 1:    // 0110
+	//     setOutputPins(0b0001);
+	//     break;
+
+	// case 2:    //0101
+	//     setOutputPins(0b0100);
+	//     break;
+
+	// case 3:    //1001
+	//     setOutputPins(0b0010);
+	//     break;
     }
 }
 
