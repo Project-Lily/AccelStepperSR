@@ -3,8 +3,6 @@
 // Copyright (C) 2015 Mike McCauley
 // $Id: MultiStepper.cpp,v 1.3 2020/04/20 00:15:03 mikem Exp mikem $
 
-#include "AccelStepper.h"
-
 template<uint8_t S>
 MultiStepper<S>::MultiStepper()
     : _num_steppers(0)
@@ -12,7 +10,7 @@ MultiStepper<S>::MultiStepper()
 }
 
 template<uint8_t S>
-boolean MultiStepper<S>::addStepper(AccelStepper<S>& stepper)
+boolean MultiStepper<S>::addStepper(AccelStepperSR<S>& stepper)
 {
     if (_num_steppers >= MULTISTEPPER_MAX_STEPPERS)
 	return false; // No room for more

@@ -14,7 +14,7 @@
 #define MULTISTEPPER_MAX_STEPPERS 10
 
 template<uint8_t S>
-class AccelStepper;
+class AccelStepperSR;
 
 /////////////////////////////////////////////////////////////////////
 /// \class MultiStepper MultiStepper.h <MultiStepper.h>
@@ -42,7 +42,7 @@ public:
     /// There is an upper limit of MULTISTEPPER_MAX_STEPPERS = 10 to the number of steppers that can be managed
     /// \param[in] stepper Reference to a stepper to add to the managed list
     /// \return true if successful. false if the number of managed steppers would exceed MULTISTEPPER_MAX_STEPPERS
-    boolean addStepper(AccelStepper<S>& stepper);
+    boolean addStepper(AccelStepperSR<S>& stepper);
 
     /// Set the target positions of all managed steppers 
     /// according to a coordinate array.
@@ -66,7 +66,7 @@ public:
 private:
     /// Array of pointers to the steppers we are controlling.
     /// Fills from 0 onwards
-    AccelStepper<S>* _steppers[MULTISTEPPER_MAX_STEPPERS];
+    AccelStepperSR<S>* _steppers[MULTISTEPPER_MAX_STEPPERS];
 
     /// Number of steppers we are controlling and the number
     /// of steppers in _steppers[]

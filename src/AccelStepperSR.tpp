@@ -1,7 +1,7 @@
-// AccelStepper.cpp
+// AccelStepperSR.cpp
 //
 // Copyright (C) 2009-2020 Mike McCauley
-// $Id: AccelStepper.cpp,v 1.24 2020/04/20 00:15:03 mikem Exp mikem $
+// $Id: AccelStepperSR.cpp,v 1.24 2020/04/20 00:15:03 mikem Exp mikem $
 
 #include "ShiftRegister74HC595.h"
 
@@ -21,7 +21,7 @@ void dump(uint8_t* p, int l)
 #endif
 
 template<uint8_t S>
-void AccelStepper<S>::moveTo(long absolute)
+void AccelStepperSR<S>::moveTo(long absolute)
 {
     if (_targetPos != absolute)
     {
@@ -32,7 +32,7 @@ void AccelStepper<S>::moveTo(long absolute)
 }
 
 template<uint8_t S>
-void AccelStepper<S>::move(long relative)
+void AccelStepperSR<S>::move(long relative)
 {
     moveTo(_currentPos + relative);
 }
@@ -41,7 +41,7 @@ void AccelStepper<S>::move(long relative)
 // You must call this at least once per step
 // returns true if a step occurred
 template<uint8_t S>
-boolean AccelStepper<S>::runSpeed()
+boolean AccelStepperSR<S>::runSpeed()
 {
     // Dont do anything unless we actually have a step interval
     if (!_stepInterval)
@@ -73,19 +73,19 @@ boolean AccelStepper<S>::runSpeed()
 }
 
 template<uint8_t S>
-long AccelStepper<S>::distanceToGo()
+long AccelStepperSR<S>::distanceToGo()
 {
     return _targetPos - _currentPos;
 }
 
 template<uint8_t S>
-long AccelStepper<S>::targetPosition()
+long AccelStepperSR<S>::targetPosition()
 {
     return _targetPos;
 }
 
 template<uint8_t S>
-long AccelStepper<S>::currentPosition()
+long AccelStepperSR<S>::currentPosition()
 {
     return _currentPos;
 }
@@ -93,7 +93,7 @@ long AccelStepper<S>::currentPosition()
 // Useful during initialisations or after initial positioning
 // Sets speed to 0
 template<uint8_t S>
-void AccelStepper<S>::setCurrentPosition(long position)
+void AccelStepperSR<S>::setCurrentPosition(long position)
 {
     _targetPos = _currentPos = position;
     _n = 0;
@@ -103,7 +103,7 @@ void AccelStepper<S>::setCurrentPosition(long position)
 
 // Subclasses can override
 template<uint8_t S>
-unsigned long AccelStepper<S>::computeNewSpeed()
+unsigned long AccelStepperSR<S>::computeNewSpeed()
 {
     long distanceTo = distanceToGo(); // +ve is clockwise from curent location
 
@@ -191,7 +191,7 @@ unsigned long AccelStepper<S>::computeNewSpeed()
 // If the motor is in the desired position, the cost is very small
 // returns true if the motor is still running to the target position.
 template<uint8_t S>
-boolean AccelStepper<S>::run()
+boolean AccelStepperSR<S>::run()
 {
     if (runSpeed())
 	computeNewSpeed();
@@ -199,7 +199,7 @@ boolean AccelStepper<S>::run()
 }
 
 template<uint8_t S>
-AccelStepper<S>::AccelStepper(uint8_t interface, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4, bool enable)
+AccelStepperSR<S>::AccelStepperSR(uint8_t interface, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4, bool enable)
 {
     _init(interface, pin1, pin2, pin3, pin4);
     if (enable)
@@ -207,7 +207,7 @@ AccelStepper<S>::AccelStepper(uint8_t interface, uint8_t pin1, uint8_t pin2, uin
 }
 
 template<uint8_t S>
-AccelStepper<S>::AccelStepper(ShiftRegister74HC595<S>* sr, uint8_t interface, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4, bool enable) {
+AccelStepperSR<S>::AccelStepperSR(ShiftRegister74HC595<S>* sr, uint8_t interface, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4, bool enable) {
     _sr = sr;
     _init(interface, pin1, pin2, pin3, pin4);
     if (enable)
@@ -215,7 +215,7 @@ AccelStepper<S>::AccelStepper(ShiftRegister74HC595<S>* sr, uint8_t interface, ui
 }
 
 template<uint8_t S>
-AccelStepper<S>::AccelStepper(void (*forward)(), void (*backward)())
+AccelStepperSR<S>::AccelStepperSR(void (*forward)(), void (*backward)())
 {
     _forward = forward;
     _backward = backward;
@@ -223,7 +223,7 @@ AccelStepper<S>::AccelStepper(void (*forward)(), void (*backward)())
 }
 
 template<uint8_t S>
-void AccelStepper<S>::_init(uint8_t interface, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4) {
+void AccelStepperSR<S>::_init(uint8_t interface, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4) {
     _interface = interface;
     _currentPos = 0;
     _targetPos = 0;
@@ -257,7 +257,7 @@ void AccelStepper<S>::_init(uint8_t interface, uint8_t pin1, uint8_t pin2, uint8
 }
 
 template<uint8_t S>
-void AccelStepper<S>::setMaxSpeed(float speed)
+void AccelStepperSR<S>::setMaxSpeed(float speed)
 {
     if (speed < 0.0)
        speed = -speed;
@@ -275,13 +275,13 @@ void AccelStepper<S>::setMaxSpeed(float speed)
 }
 
 template<uint8_t S>
-float   AccelStepper<S>::maxSpeed()
+float   AccelStepperSR<S>::maxSpeed()
 {
     return _maxSpeed;
 }
 
 template<uint8_t S>
-void AccelStepper<S>::setAcceleration(float acceleration)
+void AccelStepperSR<S>::setAcceleration(float acceleration)
 {
     if (acceleration == 0.0)
 	return;
@@ -299,13 +299,13 @@ void AccelStepper<S>::setAcceleration(float acceleration)
 }
 
 template<uint8_t S>
-float   AccelStepper<S>::acceleration()
+float   AccelStepperSR<S>::acceleration()
 {
     return _acceleration;
 }
 
 template<uint8_t S>
-void AccelStepper<S>::setSpeed(float speed)
+void AccelStepperSR<S>::setSpeed(float speed)
 {
     if (speed == _speed)
         return;
@@ -321,14 +321,14 @@ void AccelStepper<S>::setSpeed(float speed)
 }
 
 template<uint8_t S>
-float AccelStepper<S>::speed()
+float AccelStepperSR<S>::speed()
 {
     return _speed;
 }
 
 // Subclasses can override
 template<uint8_t S>
-void AccelStepper<S>::step(long step)
+void AccelStepperSR<S>::step(long step)
 {
     switch (_interface)
     {
@@ -363,7 +363,7 @@ void AccelStepper<S>::step(long step)
 }
 
 template<uint8_t S>
-long AccelStepper<S>::stepForward()
+long AccelStepperSR<S>::stepForward()
 {
     // Clockwise
     _currentPos += 1;
@@ -373,7 +373,7 @@ long AccelStepper<S>::stepForward()
 }
 
 template<uint8_t S>
-long AccelStepper<S>::stepBackward()
+long AccelStepperSR<S>::stepBackward()
 {
     // Counter-clockwise
     _currentPos -= 1;
@@ -387,7 +387,7 @@ long AccelStepper<S>::stepBackward()
 // bit 1 of the mask corresponds to _pin[1]
 // ....
 template<uint8_t S>
-void AccelStepper<S>::setOutputPins(uint8_t mask)
+void AccelStepperSR<S>::setOutputPins(uint8_t mask)
 {
     uint8_t numpins = 2;
     if (_interface == FULL4WIRE || _interface == HALF4WIRE)
@@ -406,7 +406,7 @@ void AccelStepper<S>::setOutputPins(uint8_t mask)
 
 // 0 pin step function (ie for functional usage)
 template<uint8_t S>
-void AccelStepper<S>::step0(long step)
+void AccelStepperSR<S>::step0(long step)
 {
     (void)(step); // Unused
     if (_speed > 0)
@@ -419,7 +419,7 @@ void AccelStepper<S>::step0(long step)
 // This is passed the current step number (0 to 7)
 // Subclasses can override
 template<uint8_t S>
-void AccelStepper<S>::step1(long step)
+void AccelStepperSR<S>::step1(long step)
 {
     (void)(step); // Unused
 
@@ -437,7 +437,7 @@ void AccelStepper<S>::step1(long step)
 // This is passed the current step number (0 to 7)
 // Subclasses can override
 template<uint8_t S>
-void AccelStepper<S>::step2(long step)
+void AccelStepperSR<S>::step2(long step)
 {
     switch (step & 0x3)
     {
@@ -462,7 +462,7 @@ void AccelStepper<S>::step2(long step)
 // This is passed the current step number (0 to 7)
 // Subclasses can override
 template<uint8_t S>
-void AccelStepper<S>::step3(long step)
+void AccelStepperSR<S>::step3(long step)
 {
     switch (step % 3)
     {
@@ -485,7 +485,7 @@ void AccelStepper<S>::step3(long step)
 // This is passed the current step number (0 to 7)
 // Subclasses can override
 template<uint8_t S>
-void AccelStepper<S>::step4(long step)
+void AccelStepperSR<S>::step4(long step)
 {
     switch (step & 0x3)
     {
@@ -526,7 +526,7 @@ void AccelStepper<S>::step4(long step)
 // This is passed the current step number (0 to 7)
 // Subclasses can override
 template<uint8_t S>
-void AccelStepper<S>::step6(long step)
+void AccelStepperSR<S>::step6(long step)
 {
     switch (step % 6)
     {
@@ -561,7 +561,7 @@ void AccelStepper<S>::step6(long step)
 // This is passed the current step number (0 to 7)
 // Subclasses can override
 template<uint8_t S>
-void AccelStepper<S>::step8(long step)
+void AccelStepperSR<S>::step8(long step)
 {
     switch (step & 0x7)
     {
@@ -601,7 +601,7 @@ void AccelStepper<S>::step8(long step)
     
 // Prevents power consumption on the outputs
 template<uint8_t S>
-void    AccelStepper<S>::disableOutputs()
+void    AccelStepperSR<S>::disableOutputs()
 {   
     if (! _interface) return;
 
@@ -618,7 +618,7 @@ void    AccelStepper<S>::disableOutputs()
 }
 
 template<uint8_t S>
-void    AccelStepper<S>::enableOutputs()
+void    AccelStepperSR<S>::enableOutputs()
 {
     if (! _interface) 
 	return;
@@ -649,13 +649,13 @@ void    AccelStepper<S>::enableOutputs()
 }
 
 template<uint8_t S>
-void AccelStepper<S>::setMinPulseWidth(unsigned int minWidth)
+void AccelStepperSR<S>::setMinPulseWidth(unsigned int minWidth)
 {
     _minPulseWidth = minWidth;
 }
 
 template<uint8_t S>
-void AccelStepper<S>::setEnablePin(uint8_t enablePin, bool useShiftRegister)
+void AccelStepperSR<S>::setEnablePin(uint8_t enablePin, bool useShiftRegister)
 {
     _enablePin = enablePin;
     _enable_use_sr = useShiftRegister;
@@ -672,7 +672,7 @@ void AccelStepper<S>::setEnablePin(uint8_t enablePin, bool useShiftRegister)
 }
 
 template<uint8_t S>
-void AccelStepper<S>::setPinsInverted(bool directionInvert, bool stepInvert, bool enableInvert)
+void AccelStepperSR<S>::setPinsInverted(bool directionInvert, bool stepInvert, bool enableInvert)
 {
     _pinInverted[0] = stepInvert;
     _pinInverted[1] = directionInvert;
@@ -680,7 +680,7 @@ void AccelStepper<S>::setPinsInverted(bool directionInvert, bool stepInvert, boo
 }
 
 template<uint8_t S>
-void AccelStepper<S>::setPinsInverted(bool pin1Invert, bool pin2Invert, bool pin3Invert, bool pin4Invert, bool enableInvert)
+void AccelStepperSR<S>::setPinsInverted(bool pin1Invert, bool pin2Invert, bool pin3Invert, bool pin4Invert, bool enableInvert)
 {    
     _pinInverted[0] = pin1Invert;
     _pinInverted[1] = pin2Invert;
@@ -691,14 +691,14 @@ void AccelStepper<S>::setPinsInverted(bool pin1Invert, bool pin2Invert, bool pin
 
 // Blocks until the target position is reached and stopped
 template<uint8_t S>
-void AccelStepper<S>::runToPosition()
+void AccelStepperSR<S>::runToPosition()
 {
     while (run())
 	YIELD; // Let system housekeeping occur
 }
 
 template<uint8_t S>
-boolean AccelStepper<S>::runSpeedToPosition()
+boolean AccelStepperSR<S>::runSpeedToPosition()
 {
     if (_targetPos == _currentPos)
 	return false;
@@ -711,14 +711,14 @@ boolean AccelStepper<S>::runSpeedToPosition()
 
 // Blocks until the new target position is reached
 template<uint8_t S>
-void AccelStepper<S>::runToNewPosition(long position)
+void AccelStepperSR<S>::runToNewPosition(long position)
 {
     moveTo(position);
     runToPosition();
 }
 
 template<uint8_t S>
-void AccelStepper<S>::stop()
+void AccelStepperSR<S>::stop()
 {
     if (_speed != 0.0)
     {    
@@ -731,7 +731,7 @@ void AccelStepper<S>::stop()
 }
 
 template<uint8_t S>
-bool AccelStepper<S>::isRunning()
+bool AccelStepperSR<S>::isRunning()
 {
     return !(_speed == 0.0 && _targetPos == _currentPos);
 }
