@@ -335,6 +335,7 @@
 /// Gregor Christandl reports that with an Arduino Due and a simple test program, 
 /// he measured 43163 steps per second using runSpeed(), 
 /// and 16214 steps per second using run();
+template<uint8_t S>
 class AccelStepper
 {
 public:
@@ -400,7 +401,7 @@ public:
     /// to pin 5.
     /// \param[in] enable If this is true (the default), enableOutputs() will be called to enable
     /// the output pins at construction time.
-    AccelStepper(ShiftRegister74HC595<1>* sr, uint8_t interface = AccelStepper::FULL4WIRE, uint8_t pin1 = 2, uint8_t pin2 = 3, uint8_t pin3 = 4, uint8_t pin4 = 5, bool enable = true);
+    AccelStepper(ShiftRegister74HC595<S>* sr, uint8_t interface = AccelStepper::FULL4WIRE, uint8_t pin1 = 2, uint8_t pin2 = 3, uint8_t pin3 = 4, uint8_t pin4 = 5, bool enable = true);
 
     /// Alternate Constructor which will call your own functions for forward and backward steps. 
     /// You can have multiple simultaneous steppers, all moving
@@ -744,7 +745,7 @@ private:
     float _cmin; // at max speed
 
     /// Shift register reference
-    ShiftRegister74HC595<1>* _sr;
+    ShiftRegister74HC595<S>* _sr;
 
     /// Whether enable uses shift register
     bool _enable_use_sr;
@@ -804,5 +805,7 @@ private:
 /// Shows how to use AccelStepper to control 2 x 2 phase steppers using the 
 /// Itead Studio Arduino Dual Stepper Motor Driver Shield
 /// model IM120417015
+
+#include "AccelStepperSR.tpp"
 
 #endif 

@@ -13,6 +13,7 @@
 
 #define MULTISTEPPER_MAX_STEPPERS 10
 
+template<uint8_t S>
 class AccelStepper;
 
 /////////////////////////////////////////////////////////////////////
@@ -30,6 +31,7 @@ class AccelStepper;
 /// Caution: only constant speed stepper motion is supported: acceleration and deceleration is not supported
 /// All the steppers managed by MultiStepper will step at a constant speed to their
 /// target (albeit perhaps different speeds for each stepper).
+template<uint8_t S>
 class MultiStepper
 {
 public:
@@ -40,7 +42,7 @@ public:
     /// There is an upper limit of MULTISTEPPER_MAX_STEPPERS = 10 to the number of steppers that can be managed
     /// \param[in] stepper Reference to a stepper to add to the managed list
     /// \return true if successful. false if the number of managed steppers would exceed MULTISTEPPER_MAX_STEPPERS
-    boolean addStepper(AccelStepper& stepper);
+    boolean addStepper(AccelStepper<S>& stepper);
 
     /// Set the target positions of all managed steppers 
     /// according to a coordinate array.
@@ -64,7 +66,7 @@ public:
 private:
     /// Array of pointers to the steppers we are controlling.
     /// Fills from 0 onwards
-    AccelStepper* _steppers[MULTISTEPPER_MAX_STEPPERS];
+    AccelStepper<S>* _steppers[MULTISTEPPER_MAX_STEPPERS];
 
     /// Number of steppers we are controlling and the number
     /// of steppers in _steppers[]
@@ -74,5 +76,7 @@ private:
 /// @example MultiStepper.pde
 /// Use MultiStepper class to manage multiple steppers and make them all move to 
 /// the same position at the same time for linear 2d (or 3d) motion.
+
+#include "MultiStepperSR.tpp"
 
 #endif
